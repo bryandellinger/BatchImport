@@ -1,5 +1,6 @@
-﻿using ADBatchImportForInterProd;
+using ADBatchImportForInterProd;
 using System.DirectoryServices;
+using System;
 
 namespace ADBatchImportforInterProd
 {
@@ -66,9 +67,22 @@ namespace ADBatchImportforInterProd
                entry.Properties["extensionAttribute3"].Value?.ToString().Trim().Truncate(256),
                entry.Properties["extensionAttribute13"].Value?.ToString().Trim().Truncate(256),
                entry.Properties["cn"].Value?.ToString().Trim().Truncate(256),
-               entry.Properties["extensionAttribute1"].Value?.ToString().Trim().Truncate(256),
+               GetEmployeeId(entry),
                entry.Properties["company"].Value?.ToString().Trim().Truncate(256),
                entry.Properties["extensionAttribute2"].Value?.ToString().Trim().Truncate(256));                            
          }
+
+        private static string GetEmployeeId(DirectoryEntry entry)
+        {
+            if (entry.Properties["extensionAttribute1"] != null && entry.Properties["extensionAttribute1"].Value != null && !string.IsNullOrEmpty(entry.Properties["extensionAttribute1"].Value?.ToString().Trim()))
+            {
+                return entry.Properties["extensionAttribute1"].Value?.ToString().Trim().Truncate(256);
+            }
+            if (entry.Properties["employeeId"] != null && entry.Properties["employeeId"].Value != null && !string.IsNullOrEmpty(entry.Properties["employeeId"].Value?.ToString().Trim()))
+            {
+                return entry.Properties["employeeId"].Value?.ToString().Trim().Truncate(256);
+            }
+            return string.Empty;
         }
+    }
     }
