@@ -1,4 +1,4 @@
-﻿using ADBatchImportForInterProd;
+using ADBatchImportForInterProd;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -55,8 +55,9 @@ namespace ADBatchImportforInterProd
                             }
 
                             DirectoryEntry entry = result.GetUnderlyingObject() as DirectoryEntry;
-                            if (
+                           /* if (
                                 (entry.Properties["company"].Value != null || entry.Properties["extensionAttribute2"].Value != null) &&
+                                (entry.Properties["extensionAttribute1"].Value != null || entry.Properties["employeeId"].Value != null) &&
                                 entry.Properties["objectClass"].Value != null &&
                                 !String.IsNullOrEmpty(entry.Properties["objectClass"].Value.ToString()) &&
                                 ((IEnumerable)entry.Properties["objectClass"]).Cast<object>()
@@ -64,8 +65,10 @@ namespace ADBatchImportforInterProd
                                  .ToArray().Contains("user"))
                                     {
                                         p.recordList.Add(ADDepUser.GetADDepUserFromEntry(entry));
-                                    }
+                                    }*/
+                            p.recordList.Add(ADDepUser.GetADDepUserFromEntry(entry));
                         }
+                       
                         p.service.WriteToEventLog("Active Directory Extract -- Processed " + p.recordList.Count + " records in: " + p.service.getElapsedTime(stopWatch));
                         stopWatch.Stop();
                     }
@@ -90,9 +93,9 @@ namespace ADBatchImportforInterProd
                     p.recordList = list1;
                     p.recordList.AddRange(list2);
                 }
-                var distinctRecordList = p.recordList.GroupBy(x => x.ExtensionAttribute1).Select(x => x.First()).ToList(); // get rid of any duplicates
+                //var distinctRecordList = p.recordList.GroupBy(x => x.ExtensionAttribute1).Select(x => x.First()).ToList(); // get rid of any duplicates
 
-                foreach (var record in distinctRecordList)
+                foreach (var record in p.recordList)
                 {
                     dt.Rows.Add(new string[]
                     {
@@ -111,6 +114,7 @@ namespace ADBatchImportforInterProd
                     p.service.GetDBValue(record.TelephoneNumber),
                     p.service.GetDBValue(record.WhenChanged),
                     p.service.GetDBValue(record.WhenCreated),
+                    p.service.GetDBValue(record.Company)
                     });
                 }
 
@@ -123,7 +127,7 @@ namespace ADBatchImportforInterProd
                     bc.WriteToServer(dt);
                 }
 
-                p.service.ExecuteNonQuery("truncate table cwopa_agency_file");
+                p.service.ExecuteNonQuery("truncate table cwopa_agency_file_no_filter");
 
                 p.service.ExecuteNonQuery(p.service.getCWOPAInsertStatement());
 
