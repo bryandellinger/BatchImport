@@ -68,7 +68,7 @@ namespace ADBatchImportforInterProd
                entry.Properties["extensionAttribute13"].Value?.ToString().Trim().Truncate(256),
                entry.Properties["cn"].Value?.ToString().Trim().Truncate(256),
                GetEmployeeId(entry),
-               entry.Properties["company"].Value?.ToString().Trim().Truncate(256),
+               GetCompany(entry),
                entry.Properties["extensionAttribute2"].Value?.ToString().Trim().Truncate(256));                            
          }
 
@@ -81,6 +81,19 @@ namespace ADBatchImportforInterProd
             if (entry.Properties["employeeId"] != null && entry.Properties["employeeId"].Value != null && !string.IsNullOrEmpty(entry.Properties["employeeId"].Value?.ToString().Trim()))
             {
                 return entry.Properties["employeeId"].Value?.ToString().Trim().Truncate(256);
+            }
+            return string.Empty;
+        }
+
+        private static string GetCompany(DirectoryEntry entry)
+        {
+            if (entry.Properties["company"] != null && entry.Properties["company"].Value != null && !string.IsNullOrEmpty(entry.Properties["company"].Value?.ToString().Trim()))
+            {
+                return entry.Properties["company"].Value?.ToString().Trim().Truncate(256);
+            }
+            if (entry.Properties["extensionAttribute2"] != null && entry.Properties["extensionAttribute2"].Value != null && !string.IsNullOrEmpty(entry.Properties["extensionAttribute2"].Value?.ToString().Trim()))
+            {
+                return entry.Properties["extensionAttribute2"].Value?.ToString().Trim().Truncate(256);
             }
             return string.Empty;
         }
