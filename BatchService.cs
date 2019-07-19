@@ -1,4 +1,4 @@
-﻿using ADBatchImportForInterProd;
+using ADBatchImportForInterProd;
 using System;
 using System.Configuration;
 using System.Data;
@@ -39,7 +39,8 @@ namespace ADBatchImportforInterProd
                 "streetAddress",
                 "telephoneNumber",
                 "whenChanged",
-                "whenCreated"
+                "whenCreated",
+                "company"
          };
 
         public string GetDBValue(string source) => (string.IsNullOrEmpty(source) || string.IsNullOrWhiteSpace(source)) ? null : source;
@@ -58,7 +59,7 @@ namespace ADBatchImportforInterProd
         }
 
         public string getCWOPAInsertStatement() =>
-         @"INSERT INTO cwopa_agency_file
+         @"INSERT INTO cwopa_agency_file_no_filter
             select REPLICATE('0', 8-LEN([extensionAttribute1])) + [extensionAttribute1] AS [extensionAttribute1_padded]
             -- old method:
             --        case len(extensionAttribute1)        --employee_num contains employeeID from active directory
@@ -77,9 +78,11 @@ namespace ADBatchImportforInterProd
                   ,substring(extensionAttribute3  , 1, 255)  --deputate
                   ,substring(extensionAttribute4 , 1, 255)   --bureau
                   ,substring(extensionAttribute7 , 1, 255)   --division
+                  ,substring(company , 1, 255) --company
     from  ad_dep_users 
-    where extensionAttribute1 is  not null
-      and extensionAttribute1 like REPLICATE('0', 8-LEN([extensionAttribute1])) + [extensionAttribute1]   
+    -- where extensionAttribute1 is  not null
+    -- and REPLICATE('0', 8-LEN([extensionAttribute1])) + [extensionAttribute1] is not null
+     -- and extensionAttribute1 like REPLICATE('0', 8-LEN([extensionAttribute1])) + [extensionAttribute1]   
     --     and extensionAttribute1 not like 'X%'
 --    and extensionAttribute1 in (select  PERNR from    
     -- EIS_SAP_VIEW)
